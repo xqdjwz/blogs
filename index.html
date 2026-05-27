@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>教程中心 - japan.nyc.mn</title>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/11.1.1/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .code-block-wrapper { position: relative; }
+        .copy-btn {
+            position: absolute; top: 8px; right: 8px;
+            background: rgba(243, 244, 246, 0.1); color: #d1d5db;
+            border: 1px solid rgba(156, 163, 175, 0.3); border-radius: 4px;
+            padding: 4px 8px; font-size: 11px; cursor: pointer; transition: all 0.2s;
+        }
+        .copy-btn:hover { background: rgba(243, 244, 246, 0.2); color: #fff; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900 min-h-screen flex flex-col">
+
+    <nav class="bg-white border-b border-gray-100 sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
+            <a href="#" onclick="goHome(); return false;" class="text-lg font-bold">JAPAN.NYC.MN <span class="text-sm font-normal text-gray-500">| 教程</span></a>
+            <div class="space-x-4 text-sm">
+                <a href="#" onclick="goHome(); return false;" class="text-gray-600 hover:text-blue-600">首页</a>
+                <a href="#/admin" class="text-gray-600 hover:text-blue-600">后台写作</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-grow max-w-4xl w-full mx-auto px-6 py-10">
+        
+        <!-- 视图一：前台首页 -->
+        <div id="home-view" class="space-y-6">
+            <h2 class="text-2xl font-bold">教程目录</h2>
+            <div id="posts-list-container" class="grid gap-6"></div>
+        </div>
+
+        <!-- 视图二：教程详情阅读页 -->
+        <div id="post-view" class="hidden">
+            <button onclick="goHome()" class="mb-6 text-sm text-gray-500 hover:text-blue-600">← 返回目录</button>
+            <div class="mb-4 text-xs text-gray-400 flex gap-4">
+                <span id="post-date"></span>
+                <span id="post-views-count">阅读量: 加载中...</span>
+            </div>
+            <article id="post-content" class="prose prose-blue max-w-none prose-img:rounded-lg prose-img:shadow-md prose-img:mx-auto prose-pre:p-0 prose-pre:bg-[#0d1117]"></article>
+        </div>
+
+        <!-- 视图三：后台编辑器页 -->
+        <div id="admin-view" class="hidden bg-white p-8 rounded-lg border border-gray-100 shadow-sm space-y-6">
+            <h2 class="text-2xl font-bold text-gray-900">写新教程/编辑</h2>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold uppercase text-gray-500 mb-1">管理员密码</label>
+                    <input type="password" id="admin-pass" class="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-blue-500" placeholder="请输入配置的环境变量密码">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase text-gray-500 mb-1">文章唯一 ID (用作文件名，英文/数字/拼音)</label>
+                    <input type="text" id="admin-id" class="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-blue-500" placeholder="例如: cf-r2-tutorial">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold uppercase text-gray-500 mb-1">文章标题</label>
+                <input type="text" id="admin-title" class="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-blue-500">
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold uppercase text-gray-500 mb-1">文章简短摘要</label>
+                <input type="text" id="admin-summary" class="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-blue-500">
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold uppercase text-gray-500 mb-1">教程正文 (支持拖拽/粘贴图片直接上传至 R2)</label>
+                <textarea id="admin-content" rows="15" class="w-full border border-gray-200 rounded p-3 text-sm font-mono focus:outline-blue-500" placeholder="在此使用 Markdown 格式写作，拖入图片文件可自动上传到 R2 并生成链接..."></textarea>
+            </div>
+
+            <button onclick="publishPost()" id="publish-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded text-sm font-semibold transition">
+                发布并提交至 GitHub
+            </button>
+        </div>
+
+    </main>
+
+    <footer class="bg-white border-t border-gray-100 py-8 mt-auto text-center text-xs text-gray-400">
+        <p>© 2026 japan.nyc.mn. Powered by Pages & R2 & D1</p>
+    </footer>
+
+    <script>
+        marked.setOptions({
+            highlight: function(code, lang) {
+                const language = hljs.getLanguage(lang) ? lang : 'plaintext';
+                return hljs.highlight(code, { language }).value;
+            },
+            langPrefix: 'hljs language-'
+        });
+
+        window.addEventListener('hashchange', handleRouting);
+        window.addEventListener('load', handleRouting);
+
+        function handleRouting() {
+            const hash = window.location.hash;
+            if (hash === '#/admin') {
+                showAdminView();
+            } else if (hash.startsWith('#/post/')) {
+                const postId = hash.replace('#/post/', '');
+                loadPost(postId);
+            } else {
+                showHomeView();
+            }
+        }
+
+        // 1. 加载首页
+        async function showHomeView() {
+            document.getElementById('home-view').classList.remove('hidden');
+            document.getElementById('post-view').classList.add('hidden');
+            document.getElementById('admin-view').classList.add('hidden');
+            
+            const container = document.getElementById('posts-list-container');
+            container.innerHTML = '<p class="text-gray-500">加载中...</p>';
+
+            try {
+                const response = await fetch('./posts-list.json');
+                const posts = await response.json();
+                container.innerHTML = '';
+
+                if (posts.length === 0) {
+                    container.innerHTML = '<p class="text-gray-400 text-center py-12">暂无教程发布，请前往 /#/admin 页面发布首篇教程。</p>';
+                    return;
+                }
+
+                posts.forEach(post => {
+                    container.innerHTML += `
+                        <div class="bg-white p-6 rounded-lg border border-gray-100 shadow-sm hover:shadow-md transition">
+                            <span class="text-xs text-gray-400">${post.date}</span>
+                            <h3 class="text-xl font-bold mt-1 mb-2 hover:text-blue-600"><a href="#/post/${post.id}">${post.title}</a></h3>
+                            <p class="text-gray-600 text-sm mb-4 leading-relaxed">${post.summary}</p>
+                            <a href="#/post/${post.id}" class="text-sm font-semibold text-blue-600 hover:underline">开始阅读 →</a>
+                        </div>
+                    `;
+                });
+            } catch (err) {
+                container.innerHTML = `<p class="text-red-500">加载索引文件失败，请确保您已经完成了首次部署。</p>`;
+            }
+        }
+
+        // 2. 加载教程内容并累计阅读量
+        async function loadPost(postId) {
+            document.getElementById('home-view').classList.add('hidden');
+            document.getElementById('admin-view').classList.add('hidden');
+            document.getElementById('post-view').classList.remove('hidden');
+            
+            const postContent = document.getElementById('post-content');
+            postContent.innerHTML = '正在载入内容...';
+
+            try {
+                // 读取文章
+                const response = await fetch(`./posts/${postId}.md`);
+                if (!response.ok) throw new Error('Post not found');
+                const text = await response.text();
+                postContent.innerHTML = marked.parse(text);
+
+                // 更新阅读量 (POST 请求)
+                fetch(`./api/views?id=${postId}`, { method: 'POST' })
+                    .then(r => r.json())
+                    .then(data => {
+                        document.getElementById('post-views-count').innerText = `阅读量: ${data.views}`;
+                    }).catch(() => {
+                        document.getElementById('post-views-count').innerText = `阅读量: -`;
+                    });
+
+                // 一键复制
+                addCopyButtons();
+                document.querySelectorAll('pre code').forEach(el => hljs.highlightElement(el));
+
+            } catch (err) {
+                postContent.innerHTML = '<p class="text-red-500">无法加载教程，可能该文件在您的 GitHub 仓库中不存在。</p>';
+            }
+        }
+
+        // 3. 管理端后台
+        function showAdminView() {
+            document.getElementById('home-view').classList.add('hidden');
+            document.getElementById('post-view').classList.add('hidden');
+            document.getElementById('admin-view').classList.remove('hidden');
+            setupDragAndDrop();
+        }
+
+        // 4. 图片拖入上传到 R2 的核心处理
+        function setupDragAndDrop() {
+            const textarea = document.getElementById('admin-content');
+            
+            textarea.addEventListener('dragover', (e) => e.preventDefault());
+            textarea.addEventListener('drop', async (e) => {
+                e.preventDefault();
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    await uploadImage(files[0]);
+                }
+            });
+        }
+
+        async function uploadImage(file) {
+            const password = document.getElementById('admin-pass').value;
+            const textarea = document.getElementById('admin-content');
+
+            if (!password) {
+                alert('请先输入管理员密码，以便有权限上传到 R2');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('image', file);
+
+            textarea.value += '\n[正在上传图片到 R2...]';
+
+            try {
+                const res = await fetch('./api/upload', {
+                    method: 'POST',
+                    headers: { 'Authorization': password },
+                    body: formData
+                });
+
+                if (!res.ok) throw new Error(await res.text());
+                const data = await res.json();
+
+                // 替换占位文字为正式的 Markdown 格式图片链接
+                textarea.value = textarea.value.replace('[正在上传图片到 R2...]', `\n![图片描述](${data.url})\n`);
+            } catch (err) {
+                alert('图片上传失败: ' + err.message);
+                textarea.value = textarea.value.replace('[正在上传图片到 R2...]', '\n[图片上传失败]\n');
+            }
+        }
+
+        // 5. 调用接口推送至 GitHub
+        async function publishPost() {
+            const password = document.getElementById('admin-pass').value;
+            const id = document.getElementById('admin-id').value.trim();
+            const title = document.getElementById('admin-title').value.trim();
+            const summary = document.getElementById('admin-summary').value.trim();
+            const content = document.getElementById('admin-content').value;
+            const btn = document.getElementById('publish-btn');
+
+            if (!password || !id || !title || !content) {
+                alert('请完整填写密码、ID、标题和内容');
+                return;
+            }
+
+            btn.innerText = '正在提交至 GitHub...';
+            btn.disabled = true;
+
+            try {
+                const res = await fetch('./api/publish', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': password,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        id, title, summary, content,
+                        date: new Date().toISOString().split('T')[0]
+                    })
+                });
+
+                if (!res.ok) throw new Error(await res.text());
+                alert('教程已提交发布！由于 GitHub 重构大约需要 1 分钟，请稍候刷新查看新内容。');
+                goHome();
+            } catch (err) {
+                alert('发布失败: ' + err.message);
+            } finally {
+                btn.innerText = '发布并提交至 GitHub';
+                btn.disabled = false;
+            }
+        }
+
+        function addCopyButtons() {
+            document.querySelectorAll('pre').forEach((preElement) => {
+                if (preElement.parentElement.classList.contains('code-block-wrapper')) return;
+                const wrapper = document.createElement('div');
+                wrapper.className = 'code-block-wrapper';
+                preElement.parentNode.insertBefore(wrapper, preElement);
+                wrapper.appendChild(preElement);
+
+                const button = document.createElement('button');
+                button.className = 'copy-btn';
+                button.innerText = '复制';
+                button.addEventListener('click', () => {
+                    const code = preElement.querySelector('code').innerText;
+                    navigator.clipboard.writeText(code).then(() => {
+                        button.innerText = '已复制';
+                        setTimeout(() => button.innerText = '复制', 2000);
+                    });
+                });
+                wrapper.appendChild(button);
+            });
+        }
+
+        function goHome() {
+            window.location.hash = '';
+        }
+    </script>
+</body>
+</html>
