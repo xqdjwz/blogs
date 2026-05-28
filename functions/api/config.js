@@ -23,7 +23,7 @@ export async function onRequest(context) {
     }
   }
 
-  // 2. POST 请求：更新站点配置（包含 site_popular_limit）
+  // 2. POST 请求：更新站点配置（修正 series_series 拼写笔误）
   if (request.method === "POST") {
     const authHeader = request.headers.get("Authorization");
     if (!(await verifyPassword(authHeader, env))) {
@@ -38,10 +38,10 @@ export async function onRequest(context) {
         stmt.bind("site_title", site_title),
         stmt.bind("site_subtitle", site_subtitle),
         stmt.bind("site_categories", JSON.stringify(site_categories)),
-        stmt.bind("site_series", JSON.stringify(series_series)), // 确保大系列绑定
+        stmt.bind("site_series", JSON.stringify(site_series)), // 修正完成
         stmt.bind("site_nav_links", JSON.stringify(site_nav_links)),
         stmt.bind("site_layout_mode", site_layout_mode),
-        stmt.bind("site_popular_limit", String(site_popular_limit)) // 绑定保存热门限制
+        stmt.bind("site_popular_limit", String(site_popular_limit))
       ]);
 
       return new Response(JSON.stringify({ success: true }), { headers: { "Content-Type": "application/json" } });
