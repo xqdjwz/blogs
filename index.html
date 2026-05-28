@@ -104,7 +104,6 @@
                 <div class="bg-white p-5 rounded-2xl border border-zinc-100 shadow-sm space-y-4">
                     <div class="border-b border-zinc-100 pb-2 flex items-center justify-between">
                         <h3 class="text-xs font-bold uppercase tracking-widest text-zinc-400">🔥 热门文章</h3>
-                        <!-- 动态指示当前显示前几名 -->
                         <span id="popular-top-badge" class="text-[10px] bg-amber-50 text-amber-600 px-1.5 py-0.5 rounded font-bold">TOP 5</span>
                     </div>
                     <div id="popular-posts-container" class="space-y-3"></div>
@@ -113,7 +112,7 @@
 
         </div>
 
-        <!-- 视图二：文章详情页 (限宽 5xl) -->
+        <!-- 视图二：文章详情页 (宽幅限 5xl) -->
         <div id="post-view" class="hidden max-w-5xl mx-auto bg-white p-8 rounded-2xl border border-zinc-100 shadow-sm">
             <a href="#/" class="mb-8 inline-block text-xs font-semibold uppercase tracking-wider text-zinc-400 hover:text-amber-500 flex items-center gap-1.5 transition-colors">
                 ← 返回首页
@@ -155,7 +154,7 @@
         let dbNavMeta = {};              
         let currentPageNum = 1;
         let globalLayoutMode = "standard";
-        let globalPopularLimit = 5; // 缓存全局热门文章展示数量，默认为 5
+        let globalPopularLimit = 5; 
 
         marked.setOptions({
             highlight: function(code, lang) {
@@ -198,7 +197,6 @@
                 const rawNavLinks = JSON.parse(data.site_nav_links || '[{"name": "订阅转换", "url": "https://sub.blogs.nyc.mn"}]');
                 globalLayoutMode = data.site_layout_mode || "standard";
                 
-                // 动态载入热门文章显示数量
                 globalPopularLimit = parseInt(data.site_popular_limit) || 5;
 
                 document.title = title;
@@ -206,7 +204,6 @@
                 document.getElementById('site-title-display').innerText = title;
                 document.getElementById('site-subtitle-display').innerText = subtitle;
                 
-                // 动态更新侧边栏的热门标志标签，例如：TOP 8
                 const badge = document.getElementById('popular-top-badge');
                 if (badge) badge.innerText = `TOP ${globalPopularLimit}`;
 
@@ -332,6 +329,7 @@
             await fetchPopularPosts();
         }
 
+        // 4列奶油栅格核心渲染器 (已全面加固 GPU 加速并采用自适应 aspect-video)
         async function fetchPostsAndRender(page = 1) {
             currentPageNum = page;
             const container = document.getElementById('posts-list-container');
@@ -364,9 +362,14 @@
                         ? `<img src="${post.cover}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 rounded-t-2xl" alt="${post.title}">`
                         : `<div class="w-full h-full bg-gradient-to-tr ${getGradient(index)} flex items-center justify-center text-white/10 font-bold text-3xl select-none rounded-t-2xl">BLOGS</div>`;
 
+                    // 【核心升级】：如果是 standard 显示 2 行摘要；如果是 simple，隐藏摘要，并且主标题文字提升为最多显示 2 行 (line-clamp-2) 填充空白！
                     const summaryHtml = (globalLayoutMode !== 'simple')
                         ? `<p class="text-zinc-500 text-xs leading-relaxed line-clamp-2">${post.summary}</p>`
                         : '';
+
+                    const titleClass = (globalLayoutMode === 'simple')
+                        ? "text-sm font-bold text-zinc-900 line-clamp-2 group-hover:text-amber-500 transition-colors" // 提升为最多两行
+                        : "text-sm font-bold text-zinc-900 line-clamp-1 group-hover:text-amber-500 transition-colors";
 
                     container.innerHTML += `
                         <div class="group bg-white rounded-2xl border border-zinc-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 overflow-hidden flex flex-col justify-between">
@@ -376,7 +379,7 @@
                                     <span class="absolute top-3 left-3 bg-zinc-900/80 text-white text-[10px] font-bold px-2 py-0.5 rounded backdrop-blur-sm uppercase z-10">${post.category || '未分类'}</span>
                                 </a>
                                 <div class="p-5 space-y-2">
-                                    <h3 class="text-sm font-bold text-zinc-900 line-clamp-1 group-hover:text-amber-500 transition-colors">
+                                    <h3 class="${titleClass}">
                                         <a href="#/post/${post.id}">${post.title}</a>
                                     </h3>
                                     ${summaryHtml}
@@ -445,14 +448,12 @@
             container.innerHTML = pageHtml;
         }
 
-        // 【安全动态热门限制】：不再写死为 5，而是根据全局 D1 获取到的 globalPopularLimit 动态控制侧边栏推荐数量
         async function fetchPopularPosts() {
             const container = document.getElementById('popular-posts-container');
             if (!container) return;
             container.innerHTML = '<p class="text-zinc-400 text-xs">读取中...</p>';
 
             try {
-                // 动态传入参数
                 const response = await fetch(`./api/posts?popular=${globalPopularLimit}&_t=${Date.now()}`);
                 const posts = await response.json();
                 container.innerHTML = '';
@@ -465,7 +466,7 @@
                 posts.forEach((post, index) => {
                     const thumbHtml = post.cover 
                         ? `<img src="${post.cover}" class="w-full h-full object-cover rounded-md animate-fade-in" alt="">`
-                        : `<div class="w-full h-full bg-gradient-to-tr ${getGradient(index)} rounded-md"></div>`;
+                        : `<div class="w-full h-full bg-gradient-to-tr ${getGradient(index)}"></div>`;
 
                     container.innerHTML += `
                         <a href="#/post/${post.id}" class="flex items-center gap-3 p-1.5 hover:bg-zinc-50 rounded-lg transition-colors group animate-fade-in">
