@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>blogs.nyc.mn - 数字花园</title>
-    <!-- Tailwind CSS -->
+    <!-- Tailwind CSS 与 官方排版插件 -->
     <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
     <!-- Highlight.js 代码高亮 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/11.1.1/marked.min.js"></script>
-    <!-- Vditor 所见即所得 Markdown 编辑器 (替代 EasyMDE) -->
+    <!-- Vditor 视觉编辑器 -->
     <link rel="stylesheet" href="https://unpkg.com/vditor/dist/index.css" />
     <script src="https://unpkg.com/vditor/dist/index.min.js"></script>
 
@@ -34,30 +34,30 @@
         }
         .copy-btn:hover { background: rgba(255, 255, 255, 0.15); color: #fff; }
         
-        /* 深度定制 Vditor 面板外观，使其符合 blogs.nyc.mn 极简主义设计 */
-        .vditor { border-color: #e4e4e7 !important; border-radius: 8px !important; }
-        .vditor-toolbar { border-bottom-color: #f4f4f5 !important; background-color: #fafafa !important; border-radius: 8px 8px 0 0 !important; }
+        /* 深度定制 Vditor 使其高度契合 blogs.nyc.mn 自适应宽幅设计 */
+        .vditor { border-color: #e4e4e7 !important; border-radius: 12px !important; }
+        .vditor-toolbar { border-bottom-color: #f4f4f5 !important; background-color: #fafafa !important; border-radius: 12px 12px 0 0 !important; }
         .vditor-content { background: #fff !important; }
     </style>
 </head>
 <body class="bg-[#fcfcfc] text-zinc-800 min-h-screen flex flex-col antialiased">
 
-    <!-- 导航栏 -->
+    <!-- 导航栏 (原生路由模式，彻底杜绝跳转失效) -->
     <nav class="bg-white/80 backdrop-blur-md border-b border-zinc-100 sticky top-0 z-50">
-        <div class="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
-            <a href="#" onclick="goHome(); return false;" class="flex items-center space-x-2">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <a href="#/" class="flex items-center space-x-2">
                 <span class="w-3.5 h-3.5 bg-indigo-600 rounded-full flex items-center justify-center animate-pulse"></span>
                 <span id="nav-site-title" class="text-base font-bold tracking-tight text-zinc-900">blogs.nyc.mn</span>
             </a>
             <div class="flex items-center space-x-6 text-sm">
-                <a href="#" onclick="goHome(); return false;" class="text-zinc-500 hover:text-indigo-600 font-medium transition-colors">首页</a>
+                <a href="#/" class="text-zinc-500 hover:text-indigo-600 font-medium transition-colors">首页</a>
                 <a href="#/admin" class="bg-zinc-900 text-white hover:bg-zinc-800 px-3.5 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all">后台管理</a>
             </div>
         </div>
     </nav>
 
-    <!-- 主体 -->
-    <main class="flex-grow max-w-4xl w-full mx-auto px-6 py-12">
+    <!-- 自适应宽幅容器 (自适应 6xl 设计，提供更开阔排版体验) -->
+    <main class="flex-grow max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10">
         
         <!-- 视图一：前台首页 -->
         <div id="home-view" class="space-y-8">
@@ -83,22 +83,25 @@
             </div>
         </div>
 
-        <!-- 视图二：教程详情页 -->
-        <div id="post-view" class="hidden">
-            <button onclick="goHome()" class="mb-8 text-xs font-semibold uppercase tracking-wider text-zinc-400 hover:text-indigo-600 flex items-center gap-1.5 transition-colors">
+        <!-- 视图二：教程详情页 (阅读模式自动限宽 4xl，保证极致阅读体验) -->
+        <div id="post-view" class="hidden max-w-4xl mx-auto">
+            <a href="#/" class="mb-8 inline-block text-xs font-semibold uppercase tracking-wider text-zinc-400 hover:text-indigo-600 flex items-center gap-1.5 transition-colors">
                 ← 返回目录
-            </button>
+            </a>
             <div class="mb-6 text-xs text-zinc-400 flex gap-4 border-b border-zinc-100 pb-4">
                 <span id="post-date"></span>
                 <span id="post-category" class="font-bold text-indigo-600"></span>
                 <span id="post-views-count">阅读量: 加载中...</span>
             </div>
-            <article id="post-content" class="prose prose-zinc prose-indigo max-w-none prose-img:rounded-xl prose-img:shadow-md prose-img:mx-auto prose-img:border prose-img:border-zinc-100 prose-pre:bg-[#0d1117] prose-pre:border prose-pre:border-zinc-800 prose-pre:rounded-xl prose-pre:p-0"></article>
+            <article id="post-content" class="prose prose-zinc prose-indigo max-w-none 
+                prose-headings:font-bold prose-headings:tracking-tight
+                prose-img:rounded-xl prose-img:shadow-md prose-img:mx-auto prose-img:border prose-img:border-zinc-100
+                prose-pre:bg-[#0d1117] prose-pre:border prose-pre:border-zinc-800 prose-pre:rounded-xl prose-pre:p-0"></article>
         </div>
 
         <!-- 视图三：后台管理端 -->
-        <div id="admin-view" class="hidden">
-            <!-- 登录窗口 -->
+        <div id="admin-view" class="space-y-8 hidden">
+            <!-- 登录窗口 (保持卡片限宽居中) -->
             <div id="admin-login-card" class="max-w-md mx-auto bg-white p-8 rounded-2xl border border-zinc-200/60 shadow-md space-y-6 my-12">
                 <div class="text-center">
                     <h2 class="text-xl font-bold text-zinc-900">管理后台登录</h2>
@@ -112,7 +115,7 @@
                 </div>
             </div>
 
-            <!-- 控制面板（已登录） -->
+            <!-- 控制面板（已登录，自适应最宽排版） -->
             <div id="admin-panel" class="hidden space-y-8">
                 <!-- 顶层快捷操作与密码修改 -->
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-6 rounded-xl border border-zinc-100 shadow-sm">
@@ -173,7 +176,7 @@
                     </div>
                 </div>
 
-                <!-- 编辑器工作区 -->
+                <!-- 编辑器工作区 (提供更开阔的自适应宽幅编辑视野) -->
                 <div id="editor-zone" class="bg-white p-6 rounded-xl border border-zinc-200/60 shadow-sm space-y-4">
                     <h3 id="editor-title" class="text-base font-bold text-zinc-900 border-b border-zinc-100 pb-3 tracking-tight">撰写新教程</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -196,7 +199,7 @@
                         <input type="text" id="admin-summary" class="w-full border border-zinc-200 rounded-lg px-3.5 py-2 text-sm focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500 focus:outline-none transition-all">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1.5">正文 (WYSIWYG 模式：支持直接看图排版，工具栏可一键切源码)</label>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1.5">正文 (WYSIWYG 模式：支持直接看图排版，工具栏可一键切源码 / 分屏 / 全屏)</label>
                         <div id="vditor-container" class="w-full"></div>
                     </div>
                     <div class="flex justify-end gap-3 pt-4 border-t border-zinc-100">
@@ -227,10 +230,10 @@
 
     <!-- 页脚 -->
     <footer class="bg-white border-t border-zinc-100 py-10 mt-auto text-xs text-zinc-400 tracking-wide">
-        <div class="max-w-4xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div class="flex items-center space-x-2">
                 <span class="w-2 h-2 bg-emerald-500 rounded-full inline-block"></span>
-                <span>blogs.nyc.mn • Vditor 视觉渲染版</span>
+                <span>blogs.nyc.mn • 自适应 6.0 闭环版</span>
             </div>
             <div class="text-[11px] text-zinc-400">
                 Powered by <a href="https://pages.cloudflare.com" target="_blank" class="hover:underline text-indigo-500">Cloudflare Pages</a>
@@ -516,13 +519,13 @@
             }
         }
 
-        // 2. 初始化 Vditor (集成 R2 拖拽/粘帖上传逻辑)
+        // 初始化 Vditor (已追全屏、分屏预览及即时预览)
         function initVditor() {
             if (vditorInstance) return;
             vditorInstance = new Vditor('vditor-container', {
                 height: 500,
-                mode: 'wysiwyg', // 默认为最直观的【所见即所得】模式！
-                placeholder: "在此撰写您的教程...支持工具栏富文本操作，可以直接将图片文件拖入本编辑框中，或者复制截图后直接 Ctrl+V 粘帖，全自动无感上传至 R2 并以图文格式渲染展现！",
+                mode: 'wysiwyg',
+                placeholder: "在此撰写您的教程...支持直接拖拽/粘帖截图自动无感上传至 R2 并排版呈现！",
                 cache: { enable: false },
                 toolbarConfig: { pin: true },
                 toolbar: [
@@ -531,25 +534,22 @@
                     "quote", "line", "code", "inline-code", "insert-after", "insert-before", "|",
                     "table", "|",
                     "undo", "redo", "|",
-                    "edit-mode", "html" // 'edit-mode' 支持一键切换：所见即所得 (WYSIWYG) / 即时渲染 (IR) / 纯文本代码 (Split)
+                    "edit-mode", "html", "preview", "both", "fullscreen" // 追加：html源码、单屏预览、双屏分屏、全屏写作模式
                 ],
                 upload: {
                     accept: 'image/*',
-                    // Vditor 的拦截上传核心逻辑
                     handler: async (files) => {
                         const file = files[0];
                         const url = await uploadImageViaVditor(file);
                         if (url) {
-                            // 将上传成功后的 R2 链接以 Markdown 图片格式直接插入编辑器光标所在位置
                             vditorInstance.insertValue(`![图片描述](${url})`);
                         }
-                        return null; // 返回 null 避免 Vditor 执行内部的上传器
+                        return null;
                     }
                 }
             });
         }
 
-        // Vditor 专用的图片上传处理函数
         async function uploadImageViaVditor(file) {
             const password = getActivePassword();
             const formData = new FormData();
@@ -566,7 +566,7 @@
                 const data = await res.json();
 
                 const urlObj = new URL(data.url);
-                R2_DOMAIN = urlObj.origin; // 缓存 R2 域名
+                R2_DOMAIN = urlObj.origin;
 
                 return data.url;
             } catch (err) {
@@ -626,7 +626,7 @@
             const title = document.getElementById('admin-title').value.trim();
             const summary = document.getElementById('admin-summary').value.trim();
             const category = document.getElementById('admin-category').value;
-            const content = vditorInstance.getValue(); // 获取 Vditor 内导出的纯 Markdown 内容
+            const content = vditorInstance.getValue();
             const btn = document.getElementById('publish-btn');
 
             if (!id || !title || !content) {
@@ -679,7 +679,7 @@
                 const res = await fetch(`${r2Base}/posts/${id}.md?_t=` + Date.now());
                 if (!res.ok) throw new Error();
                 const text = await res.text();
-                vditorInstance.setValue(text); // 载入到 Vditor 渲染
+                vditorInstance.setValue(text);
                 document.getElementById('editor-zone').scrollIntoView({ behavior: 'smooth' });
             } catch (e) {
                 alert('从 R2 读取正文失败');
@@ -730,10 +730,6 @@
                 });
                 wrapper.appendChild(button);
             });
-        }
-
-        function goHome() {
-            window.location.hash = '';
         }
     </script>
 </body>
