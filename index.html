@@ -163,10 +163,10 @@
                     </div>
                 </div>
 
-                <!-- 站点配置 -->
+                <!-- 站点配置 (已补回先前漏掉的 config-layout-mode，刚好凑成美观的 4 列对齐网格) -->
                 <div class="bg-white p-6 rounded-xl border border-zinc-200/60 shadow-sm space-y-4">
                     <h3 class="text-base font-bold text-zinc-900 border-b border-zinc-100 pb-3 tracking-tight">自定义站点全局配置与大系列文案</h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
                         <div>
                             <label class="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1.5">主标题</label>
                             <input type="text" id="config-title" class="w-full border border-zinc-200 rounded-lg px-3.5 py-2 text-sm focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500 focus:outline-none transition-all">
@@ -178,6 +178,13 @@
                         <div>
                             <label class="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1.5">二级子分类标签列表（用英文逗号隔开）</label>
                             <input type="text" id="config-categories" class="w-full border border-zinc-200 rounded-lg px-3.5 py-2 text-sm focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500 focus:outline-none transition-all" placeholder="例如: 技术, 随笔, 教程">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1.5">全局卡片排版模式</label>
+                            <select id="config-layout-mode" class="w-full border border-zinc-200 rounded-lg px-3.5 h-10 py-2 text-sm focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500 focus:outline-none transition-all bg-white">
+                                <option value="standard">图片 + 标题 + 摘要 (标准)</option>
+                                <option value="simple">图片 + 标题 (精简)</option>
+                            </select>
                         </div>
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -220,18 +227,22 @@
                     </div>
                 </div>
 
-                <!-- 编辑器工作区 (大系列已升级为可配置下拉选择菜单) -->
+                <!-- 编辑器工作区 -->
                 <div id="editor-zone" class="bg-white p-6 rounded-xl border border-zinc-200/60 shadow-sm space-y-4">
                     <h3 id="editor-title" class="text-base font-bold text-zinc-900 border-b border-zinc-100 pb-3 tracking-tight">撰写新教程</h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
-                        <div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div class="md:col-span-1">
                             <label class="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1.5">唯一 ID (不可修改)</label>
                             <input type="text" id="admin-id" class="w-full border border-zinc-200 rounded-lg px-3.5 py-2 text-sm focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500 focus:outline-none transition-all" placeholder="例如: advanced-markdown">
                         </div>
-                        <div>
+                        <div class="md:col-span-3">
                             <label class="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1.5">文章标题</label>
                             <input type="text" id="admin-title" class="w-full border border-zinc-200 rounded-lg px-3.5 py-2 text-sm focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500 focus:outline-none transition-all" placeholder="请输入文章主标题">
                         </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1.5">所属大系列导航</label>
                             <select id="admin-series" class="w-full border border-zinc-200 rounded-lg px-3.5 h-10 py-2 text-sm focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500 focus:outline-none transition-all bg-white">
@@ -243,6 +254,7 @@
                             </select>
                         </div>
                     </div>
+
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div class="sm:col-span-2">
                             <label class="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1.5">文章摘要</label>
@@ -257,12 +269,12 @@
                             <input type="file" id="cover-file-input" accept="image/*" class="hidden" onchange="handleCoverFileSelected()">
                         </div>
                     </div>
+
                     <div>
                         <label class="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1.5">正文 (WYSIWYG 模式：一键切源码 / 分屏 / 全屏)</label>
                         <div id="vditor-container" class="w-full"></div>
                     </div>
                     
-                    <!-- 【物理防溢出修复】：使用 sticky bottom-0 悬浮固底设计，保障按钮永久可见并提供磨砂玻璃背景 -->
                     <div class="sticky bottom-0 bg-white/95 backdrop-blur-sm py-4 border-t border-zinc-100 z-40 flex justify-end gap-3">
                         <button onclick="cancelEdit()" class="border border-zinc-200 hover:bg-zinc-50 text-zinc-600 px-5 py-2 rounded-lg text-sm font-medium transition-colors">
                             取消
@@ -371,7 +383,8 @@
                 document.getElementById('config-series').value = activeSeriesList.join(', ');
                 document.getElementById('config-nav-links').value = rawNavLinks.map(item => `${item.name}, ${item.url}`).join('\n');
                 
-                document.getElementById('config-layout-mode').value = globalLayoutMode;
+                // 【黄金修复】：之前这里因漏了 config-layout-mode 的 HTML 元素，导致赋值时抛错阻断了页面标题加载
+                setSelectValue('config-layout-mode', globalLayoutMode);
 
                 renderCategoryFilters();
                 fillCategorySelect();
@@ -465,6 +478,7 @@
             select.innerHTML += `<option value="默认系列">默认系列</option>`;
         }
 
+        // 安全节点值获取器
         function safeGetValue(id) {
             const el = document.getElementById(id);
             if (!el) {
@@ -1028,12 +1042,11 @@
             if (editorZone) editorZone.scrollIntoView({ behavior: 'smooth' });
         }
 
-        // 【安全大重构】：防空保护与异常控制
         async function publishPost() {
             try {
                 const password = getActivePassword();
                 const id = safeGetValue('admin-id').trim();
-                const title = safeGetValue('admin-title').trim(); // 正常无错获取标题！
+                const title = safeGetValue('admin-title').trim(); 
                 const summary = safeGetValue('admin-summary').trim();
                 const cover = safeGetValue('admin-cover').trim();
                 const series = safeGetValue('admin-series') || '默认系列';
@@ -1061,7 +1074,7 @@
                     headers: { 'Authorization': password, 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         id, title, summary, content, category, cover, series,
-                        layout_mode: globalLayoutMode, // 随全局排版一起自动发布
+                        layout_mode: globalLayoutMode, 
                         date: new Date().toISOString().split('T')[0]
                     })
                 });
@@ -1088,7 +1101,6 @@
             }
         }
 
-        // 【安全黄金修复】：直接通过 safeGetValue 锁定节点，绝无 Null 崩溃
         async function editPost(index) {
             try {
                 if (!window.allPosts || !window.allPosts[index]) {
