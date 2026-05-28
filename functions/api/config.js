@@ -9,10 +9,10 @@ async function verifyPassword(password, env) {
 export async function onRequest(context) {
   const { request, env } = context;
 
-  // 1. GET 请求：公开获取站点配置（加入 site_nav_links）
+  // 1. GET：加入 site_layout_mode
   if (request.method === "GET") {
     try {
-      const rows = await env.DB.prepare("SELECT key, value FROM config WHERE key IN ('site_title', 'site_subtitle', 'site_categories', 'site_series', 'site_nav_links')").all();
+      const rows = await env.DB.prepare("SELECT key, value FROM config WHERE key IN ('site_title', 'site_subtitle', 'site_categories', 'site_series', 'site_nav_links', 'site_layout_mode')").all();
       const configMap = {};
       rows.results.forEach(row => {
         configMap[row.key] = row.value;
@@ -23,7 +23,7 @@ export async function onRequest(context) {
     }
   }
 
-  // 2. POST 请求：更新站点配置（包含 site_nav_links）
+  // 2. POST：加入 site_layout_mode
   if (request.method === "POST") {
     const authHeader = request.headers.get("Authorization");
     if (!(await verifyPassword(authHeader, env))) {
@@ -31,7 +31,7 @@ export async function onRequest(context) {
     }
 
     try {
-      const { site_title, site_subtitle, site_categories, site_series, site_nav_links } = await request.json();
+      const { site_title, site_subtitle, site_categories, site_series, site_nav_links, site_layout_mode } = await request.json();
 
       const stmt = env.DB.prepare("INSERT OR REPLACE INTO config (key, value) VALUES (?, ?)");
       await env.DB.batch([
@@ -39,7 +39,8 @@ export async function onRequest(context) {
         stmt.bind("site_subtitle", site_subtitle),
         stmt.bind("site_categories", JSON.stringify(site_categories)),
         stmt.bind("site_series", JSON.stringify(site_series)),
-        stmt.bind("site_nav_links", JSON.stringify(site_nav_links)) // 保存动态工具链接
+        stmt.bind("site_nav_links", JSON.stringify(site_nav_links)),
+        stmt.bind("site_layout_mode", site_layout_mode) // 保存全局排版
       ]);
 
       return new Response(JSON.stringify({ success: true }), { headers: { "Content-Type": "application/json" } });
