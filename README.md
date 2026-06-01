@@ -63,7 +63,7 @@ INSERT OR IGNORE INTO config (key, value) VALUES ('site_layout_mode', 'standard'
 INSERT OR IGNORE INTO config (key, value) VALUES ('site_popular_limit', '5');
 INSERT OR IGNORE INTO config (key, value) VALUES ('site_r2_domain', 'https://images.blogs.nyc.mn');
 ```
-
+注意：INSERT OR IGNORE INTO config (key, value) VALUES ('site_r2_domain', 'https://images.blogs.nyc.mn'); 中的域名就是你自定义的R2的域名，一定要改，不然无法写入和读取R2数据
 ---
 
 ## 📦 第三阶段：配置 Cloudflare R2 存储桶
