@@ -169,11 +169,11 @@
                 if (!res.ok) throw new Error();
                 const data = await res.json();
                 
-                const title = data.site_title || "Blogs.nyc.mn";
-                const subtitle = data.site_subtitle || "无服务器数字花园";
+                const title = data.site_title || "xqdj.site";
+                const subtitle = data.site_subtitle || "小旗搭建网站";
                 activeCategories = JSON.parse(data.site_categories || '["技术","教程","随笔","思考"]');
-                activeSeriesList = JSON.parse(data.site_series || '["科学上网","谷歌系列","NAS系列"]');
-                const rawNavLinks = JSON.parse(data.site_nav_links || '[{"name": "订阅转换", "url": "https://sub.blogs.nyc.mn"}]');
+                activeSeriesList = JSON.parse(data.site_series || '["服务器","域名","网站搭建"]');
+                const rawNavLinks = JSON.parse(data.site_nav_links || '[{"name": "关于我", "url": "https://xqdj.site/"}]');
                 globalLayoutMode = data.site_layout_mode || "standard";
                 
                 globalPopularLimit = parseInt(data.site_popular_limit) || 5;
@@ -193,8 +193,8 @@
             } catch (err) {
                 console.error("加载全局配置出错:", err);
                 activeCategories = ["技术", "教程", "随笔", "思考"];
-                activeSeriesList = ["科学上网", "谷歌系列", "NAS系列"];
-                document.title = "blogs.nyc.mn";
+                activeSeriesList = ["服务器", "域名", "网站搭建"];
+                document.title = "xqdj.site";
                 renderCategoryFilters();
             }
         }
